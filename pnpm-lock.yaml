@@ -1,6 +1,8 @@
 lockfileVersion: 5.4
 
 specifiers:
+  '@mediapipe/camera_utils': ^0.3.1675466862
+  '@mediapipe/drawing_utils': ^0.3.1675466124
   '@mediapipe/hands': ^0.4.1675469240
   '@popperjs/core': ^2.11.6
   '@types/react': ^18.0.27
@@ -16,6 +18,8 @@ specifiers:
   vite: ^4.1.0
 
 dependencies:
+  '@mediapipe/camera_utils': 0.3.1675466862
+  '@mediapipe/drawing_utils': 0.3.1675466124
   '@mediapipe/hands': 0.4.1675469240
   '@popperjs/core': 2.11.6
   bootstrap: 5.2.3_@popperjs+core@2.11.6
@@ -504,6 +508,14 @@ packages:
       '@jridgewell/resolve-uri': 3.1.0
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
+
+  /@mediapipe/camera_utils/0.3.1675466862:
+    resolution: {integrity: sha512-siuXBoUxWo9WL0MeAxIxvxY04bvbtdNl7uCxoJxiAiRtNnCYrurr7Vl5VYQ94P7Sq0gVq6PxIDhWWeZ/pLnSzw==}
+    dev: false
+
+  /@mediapipe/drawing_utils/0.3.1675466124:
+    resolution: {integrity: sha512-/IWIB/iYRMtiUKe3k7yGqvwseWHCOqzVpRDfMgZ6gv9z7EEimg6iZbRluoPbcNKHbYSxN5yOvYTzUYb8KVf22Q==}
+    dev: false
 
   /@mediapipe/hands/0.4.1675469240:
     resolution: {integrity: sha512-GxoZvL1mmhJxFxjuyj7vnC++JIuInGznHBin5c7ZSq/RbcnGyfEcJrkM/bMu5K1Mz/2Ko+vEX6/+wewmEHPrHg==}

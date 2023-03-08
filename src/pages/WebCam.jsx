@@ -1,101 +1,99 @@
-import React, { useRef, useState, useEffect } from "react";
-import { Button } from "react-bootstrap";
 import Webcam from "react-webcam";
+import { useEffect, useRef } from "react";
+import * as cam from "@mediapipe/camera_utils";
+import { Hands } from "@mediapipe/hands";
+import * as mHands from "@mediapipe/hands";
+import * as mDraw from "@mediapipe/drawing_utils";
 
-export default function WebCam() {
+export default function WebCam(params) {
   const webcamRef = useRef(null);
-  const mediaRecorderRef = useRef(null);
-
-  const [capturing, setCapturing] = useState(false);
-  const [recordedChunks, setRecordedChunks] = useState([]);
+  const canvasRef = useRef(null);
+  let camera = null;
+  //   const connect = drawConnectors;
 
   const videoConstraints = {
     facingMode: "user",
-    aspectRatio: 1.777777778,
-    height: 844,
-    width: 300,
   };
 
-//   const buttonClicked  = () =>{
-//     let curWebcam = webcamRef.current;
-//     mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-//         mimeType: "video/mp4"
-//       });
-//       mediaRecorderRef.current.addEventListener(
-//         "dataavailable",
-//         handleDataAvailable
-//       );
-//       mediaRecorderRef.current.start();
-//     console.log(mediaRecorderRef)
-//   }
+  function onResults(results) {
+    // const video = webcamRef.current.video;
+    const videoWidth = webcamRef.current.video.videoWidth;
+    const videoHeight = webcamRef.current.video.videoHeight;
 
-    const handleStartCaptureClick = React.useCallback(() => {
-      setCapturing(true);
-      mediaRecorderRef.current = new MediaRecorder(webcamRef.current.stream, {
-        mimeType: "video/webm"
-      });
-      mediaRecorderRef.current.addEventListener(
-        "dataavailable",
-        handleDataAvailable
-      );
-      mediaRecorderRef.current.start();
-    }, [webcamRef, setCapturing, mediaRecorderRef]);
+    // Set canvas width
+    canvasRef.current.width = videoWidth;
+    canvasRef.current.height = videoHeight;
 
-    const handleDataAvailable = React.useCallback(
-      ({ data }) => {
-        if (data.size > 0) {
-          setRecordedChunks((prev) => prev.concat(data));
-        }
-      },
-      [setRecordedChunks]
+    const canvasElement = canvasRef.current;
+    const canvasCtx = canvasElement.getContext("2d");
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    canvasCtx.drawImage(
+      results.image,
+      0,
+      0,
+      canvasElement.width,
+      canvasElement.height
     );
 
-    const handleStopCaptureClick = React.useCallback(() => {
-      mediaRecorderRef.current.stop();
-      setCapturing(false);
-      console.log(recordedChunks)
-    }, [mediaRecorderRef, webcamRef, setCapturing]);
-
-    const handleDownload = React.useCallback(() => {
-      if (recordedChunks.length) {
-        const blob = new Blob(recordedChunks, {
-          type: "video/webm"
+    if (results.multiHandLandmarks) {
+      for (const landmarks of results.multiHandLandmarks) {
+        // console.log(landmarks)
+        mDraw.drawConnectors(canvasCtx, landmarks, mHands.HAND_CONNECTIONS, {
+          color: "#00FF00",
+          lineWidth: 5,
         });
-        const url = URL.createObjectURL(blob);
-        // console.log(url)
-        console.log(blob.arrayBuffer())
-        const a = document.createElement("a");
-        document.body.appendChild(a);
-        a.style = "display: none";
-        a.href = url;
-        a.download = "react-webcam-stream-capture.webm";
-        // a.click();
-        // console.log(a)
-        window.URL.revokeObjectURL(url);
-        setRecordedChunks([]);
+        mDraw.drawLandmarks(canvasCtx, landmarks, {
+          color: "#FF0000",
+          lineWidth: 2,
+        });
       }
-    }, [recordedChunks]);
+      canvasCtx.restore();
+    }
+  }
+
+  useEffect(() => {
+    const hands = new Hands({
+      locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`;
+      },
+    });
+
+    hands.setOptions({
+      maxNumHands: 2,
+      modelComplexity: 1,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+    });
+    hands.onResults(onResults);
+
+    let currCamRef = webcamRef.current;
+
+    if (typeof currCamRef !== "undefined" && currCamRef !== null) {
+      camera = new cam.Camera(currCamRef.video, {
+        onFrame: async () => {
+          await hands.send({ image: currCamRef.video });
+        },
+        width: 640,
+        height: 480,
+      });
+      camera.start();
+    }
+  }, []);
 
   return (
     <>
-      <Webcam
-        audio={false}
-        ref={webcamRef}
-        width={"300"}
-        screenshotFormat="image/jpeg"
-        videoConstraints={videoConstraints}
-      ></Webcam>
-
-      {/* <Button className="w-100 d-block fw-bold" onClick={buttonClicked}>Click me</Button> */}
-
-      {capturing ? (
-        <button onClick={handleStopCaptureClick}>Stop Capture</button>
-      ) : (
-        <button onClick={handleStartCaptureClick}>Start Capture</button>
-      )}
-      {recordedChunks.length > 0 && (
-        <button onClick={handleDownload}>Download</button>
-      )}
+      <div className="row justify-content-between">
+        <Webcam
+          ref={webcamRef}
+          className="col-5 border d-hidden d-none"
+          mirrored={true}
+          audio={false}
+          screenshotFormat="image/jpeg"
+          videoConstraints={videoConstraints}
+        />
+        <canvas className="output_canvas col border" ref={canvasRef}></canvas>
+      </div>
     </>
   );
 }
