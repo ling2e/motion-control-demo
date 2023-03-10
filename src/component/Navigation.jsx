@@ -15,6 +15,9 @@ export default function Navigation() {
         <Nav.Item as="li">
           <Link to="/Webcam" className="nav-link">WebCam</Link>
         </Nav.Item>
+        <Nav.Item as="li">
+          <Link to="/Combine" className="nav-link">Combine</Link>
+        </Nav.Item>
       </Nav>
     </>
   );

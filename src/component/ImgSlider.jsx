@@ -1,10 +1,11 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Scrollbar, A11y } from "swiper";
+import { useState, forwardRef } from "react";
 
 import "swiper/css";
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-import 'swiper/css/scrollbar';
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "swiper/css/scrollbar";
 
 // image import
 import Image1 from "../assets/images/image1.jpg";
@@ -16,7 +17,7 @@ import Image6 from "../assets/images/image6.jpg";
 import Image7 from "../assets/images/image7.jpg";
 import Image8 from "../assets/images/image8.jpg";
 
-export default function ImgSlider() {
+const ImgSlider = (props) => {
   return (
     <>
       <Swiper
@@ -26,36 +27,76 @@ export default function ImgSlider() {
         navigation
         pagination={{ clickable: true }}
         scrollbar={{ draggable: true }}
-        onSwiper={(swiper) => console.log(swiper)}
-        onSlideChange={() => console.log("slide change")}
-      >
+        onSwiper={(sw) => props.handlerClick(sw)}
         
+      >
         <SwiperSlide>
-          <img src={Image1} alt={"image1"} className="img-thumbnail" />
+          <img
+            src={Image1}
+            alt={"image1"}
+            loading="lazy"
+            className="img-thumbnail"
+          />
         </SwiperSlide>
         <SwiperSlide>
-          <img src={Image2} alt={"image2"} className="img-thumbnail" />
+          <img
+            src={Image2}
+            alt={"image2"}
+            loading="lazy"
+            className="img-thumbnail"
+          />
         </SwiperSlide>
         <SwiperSlide>
-          <img src={Image3} alt={"image3"} className="img-thumbnail" />
+          <img
+            src={Image3}
+            alt={"image3"}
+            loading="lazy"
+            className="img-thumbnail"
+          />
         </SwiperSlide>
         <SwiperSlide>
-          <img src={Image4} alt={"image4"} className="img-thumbnail" />
+          <img
+            src={Image4}
+            alt={"image4"}
+            loading="lazy"
+            className="img-thumbnail"
+          />
         </SwiperSlide>
         <SwiperSlide>
-          <img src={Image5} alt={"image5"} className="img-thumbnail" />
+          <img
+            src={Image5}
+            alt={"image5"}
+            loading="lazy"
+            className="img-thumbnail"
+          />
         </SwiperSlide>
         <SwiperSlide>
-          <img src={Image6} alt={"image6"} className="img-thumbnail" />
+          <img
+            src={Image6}
+            alt={"image6"}
+            loading="lazy"
+            className="img-thumbnail"
+          />
         </SwiperSlide>
         <SwiperSlide>
-          <img src={Image7} alt={"image7"} className="img-thumbnail" />
+          <img
+            src={Image7}
+            alt={"image7"}
+            loading="lazy"
+            className="img-thumbnail"
+          />
         </SwiperSlide>
         <SwiperSlide>
-          <img src={Image8} alt={"image8"} className="img-thumbnail" />
+          <img
+            src={Image8}
+            alt={"image8"}
+            loading="lazy"
+            className="img-thumbnail"
+          />
         </SwiperSlide>
-        img-thumbnail
       </Swiper>
     </>
   );
-}
+};
+
+export default ImgSlider;

@@ -1,57 +1,25 @@
-import Webcam from "react-webcam";
 import { useEffect, useRef } from "react";
-import * as cam from "@mediapipe/camera_utils";
+import Webcam from "react-webcam";
+// ============= mediapipe ===========
 import { Hands } from "@mediapipe/hands";
-import * as mHands from "@mediapipe/hands";
-import * as mDraw from "@mediapipe/drawing_utils";
+import { Camera } from "@mediapipe/camera_utils";
+// ========== Other =============
+import { onResults } from "../assets/Js";
 
-export default function WebCam(params) {
+export default function WebCam({swiper}) {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   let camera = null;
-  //   const connect = drawConnectors;
 
   const videoConstraints = {
     facingMode: "user",
   };
 
-  function onResults(results) {
-    // const video = webcamRef.current.video;
-    const videoWidth = webcamRef.current.video.videoWidth;
-    const videoHeight = webcamRef.current.video.videoHeight;
-
-    // Set canvas width
-    canvasRef.current.width = videoWidth;
-    canvasRef.current.height = videoHeight;
-
-    const canvasElement = canvasRef.current;
-    const canvasCtx = canvasElement.getContext("2d");
-    canvasCtx.save();
-    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-    canvasCtx.drawImage(
-      results.image,
-      0,
-      0,
-      canvasElement.width,
-      canvasElement.height
-    );
-
-    if (results.multiHandLandmarks) {
-      for (const landmarks of results.multiHandLandmarks) {
-        // console.log(landmarks)
-        mDraw.drawConnectors(canvasCtx, landmarks, mHands.HAND_CONNECTIONS, {
-          color: "#00FF00",
-          lineWidth: 5,
-        });
-        mDraw.drawLandmarks(canvasCtx, landmarks, {
-          color: "#FF0000",
-          lineWidth: 2,
-        });
-      }
-      canvasCtx.restore();
-    }
+  let canvasStyles = {
+    
   }
 
+  //   hands detection setup
   useEffect(() => {
     const hands = new Hands({
       locateFile: (file) => {
@@ -60,17 +28,17 @@ export default function WebCam(params) {
     });
 
     hands.setOptions({
-      maxNumHands: 2,
+      maxNumHands: 1,
       modelComplexity: 1,
-      minDetectionConfidence: 0.5,
-      minTrackingConfidence: 0.5,
+      minDetectionConfidence: 0.6,
+      minTrackingConfidence: 0.6,
     });
-    hands.onResults(onResults);
+    hands.onResults((res) => onResults(webcamRef, canvasRef, res));
 
     let currCamRef = webcamRef.current;
 
     if (typeof currCamRef !== "undefined" && currCamRef !== null) {
-      camera = new cam.Camera(currCamRef.video, {
+      camera = new Camera(currCamRef.video, {
         onFrame: async () => {
           await hands.send({ image: currCamRef.video });
         },
@@ -86,13 +54,17 @@ export default function WebCam(params) {
       <div className="row justify-content-between">
         <Webcam
           ref={webcamRef}
-          className="col-5 border d-hidden d-none"
+          className="col border "
           mirrored={true}
           audio={false}
           screenshotFormat="image/jpeg"
           videoConstraints={videoConstraints}
         />
-        <canvas className="output_canvas col border" ref={canvasRef}></canvas>
+        <canvas
+          className="output_canvas col border d-none"
+          style={canvasStyles}
+          ref={canvasRef}
+        ></canvas>
       </div>
     </>
   );
